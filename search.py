@@ -108,13 +108,46 @@ def depthFirstSearch(problem):
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    open = util.Queue()
+    # (position, action, actions[])
+    start = (problem.getStartState(), None, [])
+    open.push(start)
+    visited = []
+    while not open.isEmpty():
+        curr_node = open.pop()
+        if problem.isGoalState(curr_node[0]):
+            return curr_node[2]
+        if curr_node[0] not in visited:
+            visited.append(curr_node[0])
+            successor = problem.getSuccessors(curr_node[0])
+            for nodes in successor:
+                if nodes[0] not in visited:  # cycle checking
+                    add_to_path = curr_node[2]+[nodes[1]]
+                    nodes = (nodes[0], nodes[1], add_to_path)
+                    open.push(nodes)
+    return []
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    open = util.PriorityQueue()
+    # (position, cost, actions[])
+    start = (problem.getStartState(), None, [])
+    open.push(start, 0)
+    visited = []
+    while not open.isEmpty():
+        curr_node = open.pop()
+        if problem.isGoalState(curr_node[0]):
+            return curr_node[2]
+        if curr_node[0] not in visited:
+            visited.append(curr_node[0])
+            successor = problem.getSuccessors(curr_node[0])
+            for nodes in successor:
+                if nodes[0] not in visited:  # cycle checking
+                    add_to_path = curr_node[2]+[nodes[1]]
+                    cost = problem.getCostOfActions(add_to_path)
+                    nodes = (nodes[0], nodes[1], add_to_path)
+                    open.push(nodes, cost)
+    return []
 
 def nullHeuristic(state, problem=None):
     """
@@ -125,8 +158,26 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    open = util.PriorityQueue()
+    # (position, cost, actions[])
+    start = (problem.getStartState(), None, [])
+    open.push(start, 0)
+    visited = []
+    while not open.isEmpty():
+        curr_node = open.pop()
+        if problem.isGoalState(curr_node[0]):
+            return curr_node[2]
+        if curr_node[0] not in visited:
+            visited.append(curr_node[0])
+            successor = problem.getSuccessors(curr_node[0])
+            for nodes in successor:
+                if nodes[0] not in visited:  # cycle checking
+                    add_to_path = curr_node[2]+[nodes[1]]
+                    g = problem.getCostOfActions(add_to_path)
+                    f = g + heuristic(nodes[0], problem)
+                    nodes = (nodes[0], nodes[1], add_to_path)
+                    open.push(nodes, f)
+    return []
 
 
 # Abbreviations
