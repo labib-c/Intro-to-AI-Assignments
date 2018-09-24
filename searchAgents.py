@@ -372,7 +372,7 @@ def cornersHeuristic(state, problem):
     for corner in corners_needed:
         distance = util.manhattanDistance((x, y), corner)
         if distance > h:
-            h = distance
+            h += distance
     return h
 
 
