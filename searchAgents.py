@@ -33,7 +33,6 @@ description for details.
 
 Good luck and happy searching!
 """
-
 from game import Directions
 from game import Agent
 from game import Actions
@@ -293,8 +292,7 @@ class CornersProblem(search.SearchProblem):
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
-        # (x, y) = self.startingPosition
-        start_state = (self.startingPosition, (0, 0, 0, 0))
+        start_state = (self.startingPosition, tuple(self.corners))
         return start_state
 
     def isGoalState(self, state):
@@ -363,18 +361,17 @@ def cornersHeuristic(state, problem):
     ((x,y), goal) = state
     corners_needed = []
     for i in range(len(goal)):
-        if goal[i] == 0:
-            corners_needed.append(corners[i])
+        if goal[i] != 1:
+            corners_needed.append(goal[i])
 
     if not corners_needed:
         return 0
-    h = 0
+    h = []
     for corner in corners_needed:
         distance = util.manhattanDistance((x, y), corner)
-        if distance > h:
-            h += distance
-    return h
-
+        if distance > sum(h):
+            h.append(distance)
+    return sum(h)
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -468,12 +465,15 @@ def foodHeuristic(state, problem):
     food_list = foodGrid.asList()
     if not food_list:
         return 0
-    h = 0
+
+    h = []
     for food in food_list:
-        dist = mazeDistance(food, position, problem.startingGameState)
-        if dist > h:
-            h = dist
-    return h
+        h.append(euclideanDistance(food, position))
+    return sum(h)/len(h)
+
+def euclideanDistance(xy1, xy2):
+    return ((xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2) ** 0.5
+
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -536,7 +536,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         The state is Pacman's position. Fill this in with a goal test that will
         complete the problem definition.
         """
-        x,y = state
+        x, y = state
         food_list = self.food.asList()
         return (x, y) in food_list
 

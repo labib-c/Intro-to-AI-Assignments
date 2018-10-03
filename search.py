@@ -171,7 +171,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             visited.append(curr_node[0])
             successor = problem.getSuccessors(curr_node[0])
             for nodes in successor:
-                if nodes[0] not in visited:  # cycle checking
+                if nodes[0] not in visited:
                     add_to_path = curr_node[2]+[nodes[1]]
                     g = problem.getCostOfActions(add_to_path)
                     f = g + heuristic(nodes[0], problem)
