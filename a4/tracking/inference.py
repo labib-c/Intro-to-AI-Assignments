@@ -499,7 +499,12 @@ class JointParticleFilter:
         weight with each position) is incorrect and may produce errors.
         """
         "*** YOUR CODE HERE ***"
-
+        positions = list(itertools.product(self.legalPositions, repeat=self.numGhosts))
+        random.shuffle(positions)
+        particleDistribution = []
+        for i in range(self.numParticles):
+            particleDistribution.append(positions[i % len(positions)])
+        self.particles = particleDistribution
         "*** END YOUR CODE HERE ***"
 
     def addGhostAgent(self, agent):
@@ -566,6 +571,23 @@ class JointParticleFilter:
         emissionModels = [busters.getObservationDistribution(dist) for dist in noisyDistances]
 
         "*** YOUR CODE HERE ***"
+        belief = util.Counter()
+        for particle in self.particles:
+            prob = 1
+            for i in range(self.numGhosts):
+                if noisyDistances[i] is None:
+                    particle = self.getParticleWithGhostInJail(particle, i)
+                else:
+                    d = util.manhattanDistance(particle[i], pacmanPosition)
+                    prob = prob*emissionModels[i][d]
+            belief[particle] += prob
+
+        if belief.totalCount() == 0:
+            self.initializeParticles()
+        else:
+            for i in range(self.numParticles):
+                self.particles[i] = util.sample(belief)
+
 
         "*** END YOUR CODE HERE ***"
 
@@ -628,6 +650,10 @@ class JointParticleFilter:
             # now loop through and update each entry in newParticle...
 
             "*** YOUR CODE HERE ***"
+            for i in range(self.numGhosts):
+                newPosDist = getPositionDistributionForGhost(setGhostPositions(gameState, newParticle),
+                                                             i, self.ghostAgents[i])
+                newParticle[i] = util.sample(newPosDist)
 
             "*** END YOUR CODE HERE ***"
             newParticles.append(tuple(newParticle))
@@ -635,8 +661,11 @@ class JointParticleFilter:
 
     def getBeliefDistribution(self):
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
-        "*** END YOUR CODE HERE ***"
+        belief = util.Counter()
+        for p in self.particles:
+            belief[p] += 1.0
+        belief.normalize()
+        return belief
 
 
 # One JointInference module is shared globally across instances of MarginalInference
