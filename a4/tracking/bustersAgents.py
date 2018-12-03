@@ -163,4 +163,26 @@ class GreedyBustersAgent(BustersAgent):
             [beliefs for i, beliefs in enumerate(self.ghostBeliefs)
              if livingGhosts[i+1]]
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        highestProbGhosts = []
+        for ghostBelief in livingGhostPositionDistributions:
+            highestProbGhosts.append(ghostBelief.argMax())
+        closest = min(highestProbGhosts)
+
+        possibleActions = {}
+        for action in legal:
+            successorPosition = Actions.getSuccessor(pacmanPosition, action)
+            d = self.distancer.getDistance(successorPosition, closest)
+            possibleActions[action] = d
+
+        return min(possibleActions, key=possibleActions.get)
+
+
+
+
+        # self.distancer.getDistance(pos1, pos2) #maze distance
+        #
+        # successorPosition = Actions.getSuccessor(position, action) #successor after an action
+
+
+
