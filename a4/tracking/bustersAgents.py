@@ -180,9 +180,3 @@ class GreedyBustersAgent(BustersAgent):
 
 
 
-        # self.distancer.getDistance(pos1, pos2) #maze distance
-        #
-        # successorPosition = Actions.getSuccessor(position, action) #successor after an action
-
-
-
