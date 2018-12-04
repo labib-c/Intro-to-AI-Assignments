@@ -379,14 +379,20 @@ class ParticleFilter(InferenceModule):
             belief = util.Counter()
             beliefDist = self.getBeliefDistribution()
             for p in self.legalPositions:
-                trueDistance = util.manhattanDistance(p, pacmanPosition)
-                if emissionModel[trueDistance] > 0:
-                    belief[p] = emissionModel[trueDistance] * beliefDist[p]
+                if p in self.particles:
+                    i = self.particles.index(p)
+                    trueDistance = util.manhattanDistance(p, pacmanPosition)
+                    if emissionModel[trueDistance] > 0:
+                        belief[i] = emissionModel[trueDistance] * beliefDist[p]
+
+
+
             if belief.totalCount() == 0:
                 self.initializeUniformly(gameState)
             else:
-                for i in range(self.numParticles):
-                    self.particles[i] = util.sample(belief)
+                belief.normalize()
+                self.particles = util.nSample(belief, self.particles, self.numParticles)
+
 
         "*** END YOUR CODE HERE ***"
 
@@ -585,8 +591,10 @@ class JointParticleFilter:
         if belief.totalCount() == 0:
             self.initializeParticles()
         else:
+            belief.normalize()
+            self.particles = []
             for i in range(self.numParticles):
-                self.particles[i] = util.sample(belief)
+                self.particles.append(util.sample(belief))
 
 
         "*** END YOUR CODE HERE ***"
