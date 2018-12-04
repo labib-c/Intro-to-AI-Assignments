@@ -584,8 +584,7 @@ class JointParticleFilter:
                 if noisyDistances[i] is None:
                     particle = self.getParticleWithGhostInJail(particle, i)
                 else:
-                    d = util.manhattanDistance(particle[i], pacmanPosition)
-                    prob = prob*emissionModels[i][d]
+                    prob = prob*emissionModels[i][util.manhattanDistance(particle[i], pacmanPosition)]
             belief[particle] += prob
 
         if belief.totalCount() == 0:
