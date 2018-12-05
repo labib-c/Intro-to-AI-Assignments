@@ -201,13 +201,12 @@ class ExactInference(InferenceModule):
 
         allPossible = util.Counter()
 
-        if noisyDistance == None:
+        if noisyDistance is None:
             allPossible[self.getJailPosition()] = 1
 
         for p in self.legalPositions:
             trueDistance = util.manhattanDistance(p, pacmanPosition)
-            if emissionModel[trueDistance] > 0:
-                allPossible[p] = self.beliefs[p] * emissionModel[trueDistance]
+            allPossible[p] = self.beliefs[p] * emissionModel[trueDistance]
 
         "*** END YOUR CODE HERE ***"
 
@@ -335,10 +334,9 @@ class ParticleFilter(InferenceModule):
         weight with each position) is incorrect and may produce errors.
         """
         "*** YOUR CODE HERE ***"
-        particleDistribution = []
+        self.particles = []
         for i in range(self.numParticles):
-            particleDistribution.append(self.legalPositions[i % len(self.legalPositions)])
-        self.particles = particleDistribution
+            self.particles.append(self.legalPositions[i % len(self.legalPositions)])
         "*** END YOUR CODE HERE ***"
 
     def observe(self, observation, gameState):
@@ -372,7 +370,7 @@ class ParticleFilter(InferenceModule):
         emissionModel = busters.getObservationDistribution(noisyDistance)
         pacmanPosition = gameState.getPacmanPosition()
         "*** YOUR CODE HERE ***"
-        if noisyDistance == None:
+        if noisyDistance is None:
             for i in range(len(self.particles)):
                 self.particles[i] = self.getJailPosition()
         else:
@@ -382,18 +380,12 @@ class ParticleFilter(InferenceModule):
                 if p in self.particles:
                     i = self.particles.index(p)
                     trueDistance = util.manhattanDistance(p, pacmanPosition)
-                    if emissionModel[trueDistance] > 0:
-                        belief[i] = emissionModel[trueDistance] * beliefDist[p]
-
-
-
+                    belief[i] = emissionModel[trueDistance] * beliefDist[p]
             if belief.totalCount() == 0:
                 self.initializeUniformly(gameState)
             else:
                 belief.normalize()
                 self.particles = util.nSample(belief, self.particles, self.numParticles)
-
-
         "*** END YOUR CODE HERE ***"
 
     def elapseTime(self, gameState):
